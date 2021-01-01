@@ -21,7 +21,7 @@ async function run(inputFileRelative: string) {
       context: inputDirAbsolute,
       plugins: [
         rollupPluginTypescript({
-          //          include,
+          include,
           tsconfig: false,
           target: "es5",
           strict: true,
