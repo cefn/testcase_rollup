@@ -2,10 +2,12 @@ import path from "path";
 import * as rollup from "rollup";
 import rollupPluginTypescript from "@rollup/plugin-typescript";
 
+const relativeFile = "./test/lib/testdomain/index/map/prefix.ts";
+run(relativeFile);
+
 /** Uses rollup API as documented at https://rollupjs.org/guide/en/#javascript-api */
-async function run() {
+async function run(relativeFile: string) {
   try {
-    const relativeFile = "./test/lib/testdomain/index/map/prefix.ts";
     const relativeFileDir = path.dirname(relativeFile);
     const absoluteFile = path.resolve(process.cwd(), relativeFile);
     const absoluteFileDir = path.resolve(process.cwd(), relativeFileDir);
@@ -14,11 +16,8 @@ async function run() {
       context: absoluteFileDir,
       plugins: [
         rollupPluginTypescript({
-          // rootDir: process.cwd(),
-          // outDir: absoluteFileDir,
           tsconfig: false,
-          //          tsconfig: path.resolve(process.cwd(), "tsconfig.json"),
-          include: `./test/lib/testdomain/**/*.ts`,
+          include: `${path.join(relativeFileDir, "../../**/*")}.ts`,
           alwaysStrict: false,
           noImplicitUseStrict: true,
           target: "es5",
@@ -39,5 +38,3 @@ async function run() {
   }
   console.log("Success!");
 }
-
-run();
