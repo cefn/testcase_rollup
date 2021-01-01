@@ -3,16 +3,11 @@ import * as rollup from "rollup";
 import rollupPluginTypescript from "@rollup/plugin-typescript";
 
 const inputFileRelative = "./test/lib/testdomain/index/map/prefix.ts";
-const includesRelative = [
-  inputFileRelative,
-  "./lib/mapreduce.ts",
-  "./test/lib/testdomain/index/common/util.ts",
-];
 
-run(inputFileRelative, includesRelative);
+run(inputFileRelative);
 
 /** Uses rollup API as documented at https://rollupjs.org/guide/en/#javascript-api */
-async function run(inputFileRelative: string, includesRelative: string[]) {
+async function run(inputFileRelative: string) {
   try {
     const inputDirRelative = path.dirname(inputFileRelative);
     const inputFileAbsolute = path.resolve(process.cwd(), inputFileRelative);
@@ -22,7 +17,8 @@ async function run(inputFileRelative: string, includesRelative: string[]) {
       context: inputDirAbsolute,
       plugins: [
         rollupPluginTypescript({
-          include: includesRelative,
+          exclude: "**/*.ts",
+          include: inputFileRelative,
           tsconfig: false,
           target: "es5",
           strict: true,
