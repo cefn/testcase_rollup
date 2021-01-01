@@ -1,33 +1,19 @@
 # testcase_rollup
 
-We need to define an operation that takes a path to a single typescript file, and outputs a single javascript bundle for it.
+We need to define an operation that takes a path to a single typescript file, and outputs a single javascript bundle including it and its imports using rollup.
 
-So far we hav been defeated by surprising behaviours of the `input` and `include` parameters. This minimal reproduction is intended to inform discussion to establish what parameters are needed for this apparently simple case.
+Two configurations currently succeed at compiling the input file. Neither makes much sense as described below.
 
-The bundle _can_ succeed without transpiling more files than necessary but only with a surprising setting to the `include` parameter as detailed below.
+I am hoping there is a parameter which achieves what is **_really_** needed.
 
-## Various include settings
+- Specify `include` so it explicitly lists all \*.ts files which are imported.
+  - Problem: you have to inspect the recursive imports of a file to bundle it
+  - This defeats the purpose of a bundling library, since I will have to recursively inspect and list all imports, meaning I am effectively building my own bundling library and could just use typescript transpile.
+- Omit `include`.
+  - Problem: rollup attempts to transpile all files in the whole project
+  - I believe `rootDir` becomes implicitly the longest common path of mapreduce.js and prefix.js (which is the project root folder) and `include` is implicitly "\*_/_.ts". Hence rollup transpiles all project files.
 
-The test cases below are provided as branches to explore alternatives. None currently make much sense. Some rollup plugin configurations seem to transpile more files than the ones referenced by the `input` source .ts file. Others fail to match the `input` file at all. The configuration which works can't be sensibly derived from the input path.
-
-- RESULT: SUCCESS!
-  - `main` - set `include` to match `**/*.ts` two directories above relative input directory
-  - `` const include = `${path.join(inputDirRelative, "../../**/*")}.ts`; ``
-- RESULT: FAILURE: Included file `util.ts` has `Unexpected token`
-  - `include-exact` - set `include` to be the input file
-    - `const include = inputFileRelative;`
-  - `include-wildcard` - set `include` to match `*.ts` within directory of input file
-    - `` const include = `${path.join(inputDirRelative, "*")}.ts`;  ``
-  - `include-doublestar` - set `include` to match `**/*.ts` within directory of input file
-    - `` const include = `${path.join(inputDirRelative, "**/*")}.ts`; ``
-- RESULT: WARNING: transpiles all project .ts files in the project, including test_rollup.ts which reports `@rollup/plugin-typescript TS1259: Module '"path"' can only be default-imported using the 'allowSyntheticDefaultImports' flag`
-  - `include-none` - omit the `include` parameter altogether
-    - `// include,`
-    - Notes: `rootDir` is implicitly the longest common path of mapreduce.js + prefix.js and `include` is implicitly `**/*.ts` ?
-
-I believe the `include` property should control the set of files which might be considered for transpilation, (added to those referenced by the `input` file) . However its behaviour is surprising. The success cases and failure cases don't make any sense from my understanding of its intended behaviour.
-
-Many attempts to set the `include` parameter raise a `Syntax Error`, meaning the input file is not matched by the typescript `include`, and is therefore not transpiled beforehand : parsing typescript as javascript raises a syntax error.
+This repository is a minimal repro of the issue, with the aim of finding parameters for typescript and rollup to be able to transpile and bundling ONLY a file and its imports.
 
 ## Running the test case
 
