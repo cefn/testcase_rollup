@@ -11,13 +11,17 @@ async function run(inputFileRelative: string) {
     const inputDirRelative = path.dirname(inputFileRelative);
     const inputFileAbsolute = path.resolve(process.cwd(), inputFileRelative);
     const inputDirAbsolute = path.resolve(process.cwd(), inputDirRelative);
-    const include = `${path.join(inputDirRelative, "../../**/*")}.ts`;
+    const include = [
+      inputFileRelative,
+      "./lib/mapreduce.ts",
+      "./test/lib/testdomain/index/common/util.ts",
+    ];
     const input: rollup.InputOptions = {
       input: inputFileAbsolute,
       context: inputDirAbsolute,
       plugins: [
         rollupPluginTypescript({
-          include,
+          //          include,
           tsconfig: false,
           target: "es5",
           strict: true,

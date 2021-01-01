@@ -14,21 +14,16 @@ The test cases below are provided as branches to explore alternatives. None curr
   - `main` - set `include` to match `**/*.ts` two directories above relative input directory
   - `` const include = `${path.join(inputDirRelative, "../../**/*")}.ts`; ``
 - RESULT: FAILURE: Included file `util.ts` has `Unexpected token`
-
   - `include-exact` - set `include` to be the input file
     - `const include = inputFileRelative;`
   - `include-wildcard` - set `include` to match `*.ts` within directory of input file
     - `` const include = `${path.join(inputDirRelative, "*")}.ts`;  ``
   - `include-doublestar` - set `include` to match `**/*.ts` within directory of input file
     - `` const include = `${path.join(inputDirRelative, "**/*")}.ts`; ``
-
-- `include-none` - omit the `include` parameter altogether
-
-  - ```
-
-    ```
-
-  - RESULT: FAILURE: transpiles all project .ts files in the project, (`rootDir` is implicitly the longest common path of mapreduce.js and prefix.js and `include` is implicitly `**/*.ts` ?)
+- RESULT: WARNING: transpiles all project .ts files in the project, including test_rollup.ts which reports `@rollup/plugin-typescript TS1259: Module '"path"' can only be default-imported using the 'allowSyntheticDefaultImports' flag`
+  - `include-none` - omit the `include` parameter altogether
+    - `// include,`
+    - Notes: `rootDir` is implicitly the longest common path of mapreduce.js + prefix.js and `include` is implicitly `**/*.ts` ?
 
 I believe the `include` property should control the set of files which might be considered for transpilation, (added to those referenced by the `input` file) . However its behaviour is surprising. The success cases and failure cases don't make any sense from my understanding of its intended behaviour.
 
